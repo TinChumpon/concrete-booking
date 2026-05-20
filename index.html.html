@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบรับจองคอนกรีต</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F4F1EB;
+    --surface: #FDFCF9;
+    --surface2: #F0EDE6;
+    --border: #D8D3C8;
+    --border2: #C8C2B5;
+    --text: #1A1815;
+    --text2: #5C5749;
+    --text3: #9A9287;
+    --accent: #C85A1A;
+    --accent-bg: #FDF0E8;
+    --accent-dark: #8C3A0A;
+    --blue: #1A5A8C;
+    --blue-bg: #E8F0FA;
+    --green: #1A6B3A;
+    --green-bg: #E8F5EC;
+    --red: #A32D2D;
+    --red-bg: #FCEBEB;
+    --amber: #854F0B;
+    --amber-bg: #FAEEDA;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  header {
+    background: var(--text);
+    color: #F4F1EB;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  header .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 600; color: white;
+  }
+
+  header h1 { font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
+  header .subtitle { font-size: 12px; color: rgba(244,241,235,0.5); margin-left: auto; font-family: 'IBM Plex Mono', monospace; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 56px);
+  }
+
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 56px);
+    position: sticky;
+    top: 56px;
+  }
+
+  .main { padding: 1.5rem; overflow-y: auto; }
+
+  .date-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 1.25rem;
+  }
+
+  .date-bar label { font-size: 12px; color: var(--text2); font-weight: 500; }
+
+  .date-bar input[type=date] {
+    border: none;
+    background: transparent;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+  }
+
+  .date-bar .today-btn {
+    margin-left: auto;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    color: var(--accent-dark);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .date-bar .today-btn:hover { background: var(--accent); color: white; }
+
+  .form-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .form-group { margin-bottom: 12px; }
+
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text2);
+    margin-bottom: 4px;
+  }
+
+  .form-group label .req { color: var(--accent); margin-left: 2px; }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(200,90,26,0.12);
+  }
+
+  .form-group textarea { resize: vertical; min-height: 60px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 11px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.02em;
+  }
+
+  .submit-btn:hover { background: var(--accent-dark); }
+  .submit-btn:active { transform: scale(0.98); }
+
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+
+  .stat-card .s-label { font-size: 11px; color: var(--text3); font-weight: 500; margin-bottom: 2px; }
+  .stat-card .s-val { font-size: 22px; font-weight: 600; color: var(--text); line-height: 1; }
+  .stat-card .s-unit { font-size: 11px; color: var(--text2); margin-top: 1px; }
+  .stat-card.accent { border-color: var(--accent); background: var(--accent-bg); }
+  .stat-card.accent .s-val { color: var(--accent-dark); }
+
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-bar input[type=text] {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 11px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    width: 200px;
+  }
+
+  .filter-bar input[type=text]:focus { border-color: var(--accent); }
+
+  .filter-bar select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 11px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+  }
+
+  .filter-bar .rec-count {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--text3);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    overflow-x: auto;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
+
+  thead th {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text2);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  thead th:hover { color: var(--accent); }
+  thead th.no-sort { cursor: default; }
+  thead th.no-sort:hover { color: var(--text2); }
+
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg); }
+
+  td { padding: 10px 12px; vertical-align: middle; white-space: nowrap; }
+
+  td.time-cell { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; color: var(--blue); }
+  td.vol-cell { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--accent-dark); }
+
+  .customer-name { font-weight: 600; color: var(--text); }
+  .location-text { color: var(--text2); font-size: 12px; }
+  .phone-text { color: var(--text3); font-size: 12px; font-family: 'IBM Plex Mono', monospace; }
+
+  .struct-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--blue-bg);
+    color: var(--blue);
+  }
+
+  .ksc-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--surface2);
+    color: var(--text2);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .interval-text { font-size: 12px; color: var(--text2); font-family: 'IBM Plex Mono', monospace; }
+
+  .note-text {
+    font-size: 12px;
+    color: var(--text2);
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .del-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 10px;
+    color: var(--red);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    transition: background 0.1s;
+  }
+  .del-btn:hover { background: var(--red-bg); border-color: var(--red); }
+
+  /* ─── Cancel Log table ─── */
+  .cancelled-row { background: #FFF8F7; }
+  .cancelled-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--red-bg);
+    color: var(--red);
+  }
+  .canceller-text { font-size: 12px; font-weight: 600; color: var(--red); }
+  .cancel-time-text { font-size: 11px; color: var(--text3); font-family: 'IBM Plex Mono', monospace; }
+
+  /* ─── Timeline ─── */
+  .timeline-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-top: 1rem;
+  }
+
+  .timeline-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 1rem;
+  }
+
+  .tl-item { display: flex; gap: 14px; margin-bottom: 14px; align-items: flex-start; }
+
+  .tl-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--blue);
+    min-width: 50px;
+    padding-top: 2px;
+  }
+
+  .tl-line { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 3px; }
+  .tl-connector { width: 2px; background: var(--border); flex: 1; min-height: 28px; margin-top: 2px; }
+
+  .tl-content {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 4px;
+  }
+
+  .tl-customer { font-weight: 600; font-size: 13px; }
+  .tl-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text3); }
+  .empty-state .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.3; }
+  .empty-state p { font-size: 13px; }
+
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--text);
+    color: #F4F1EB;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  #toast.show { opacity: 1; transform: translateY(0); }
+  #toast.success { background: var(--green); }
+  #toast.error { background: var(--red); }
+
+  .view-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 3px;
+    width: fit-content;
+  }
+
+  .view-tab {
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text2);
+    border: none;
+    background: transparent;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    transition: background 0.15s, color 0.15s;
+    position: relative;
+  }
+
+  .view-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .view-tab:hover:not(.active) { color: var(--text); }
+
+  .view-tab .badge-dot {
+    position: absolute;
+    top: 5px; right: 6px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+  }
+
+  #table-view, #timeline-view, #cancel-view { display: none; }
+  #table-view.active-view, #timeline-view.active-view, #cancel-view.active-view { display: block; }
+
+  /* ─── Delete modal ─── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26,24,21,0.55);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    width: 340px;
+    max-width: 90vw;
+  }
+
+  .modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+
+  .modal-sub {
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 1rem;
+  }
+
+  .modal-booking-info {
+    background: var(--red-bg);
+    border: 1px solid rgba(163,45,45,0.2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 1rem;
+  }
+
+  .modal-booking-info .mbi-name { font-weight: 600; font-size: 13px; color: var(--red); }
+  .modal-booking-info .mbi-detail { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  .modal-input-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 4px; display: block; }
+  .modal-input-label .req { color: var(--accent); }
+
+  .modal-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 11px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+    margin-bottom: 1rem;
+  }
+
+  .modal-input:focus { border-color: var(--red); box-shadow: 0 0 0 2px rgba(163,45,45,0.12); }
+
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  .modal-cancel-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 16px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+
+  .modal-cancel-btn:hover { background: var(--surface2); }
+
+  .modal-confirm-btn {
+    background: var(--red);
+    border: none;
+    border-radius: 7px;
+    padding: 8px 16px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: background 0.1s, transform 0.1s;
+  }
+
+  .modal-confirm-btn:hover { background: #7A1F1F; }
+  .modal-confirm-btn:active { transform: scale(0.97); }
+  .modal-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">C</div>
+  <h1>ระบบรับจองคอนกรีต</h1>
+  <span class="subtitle" id="header-date"></span>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="date-bar">
+      <label>วันที่จอง</label>
+      <input type="date" id="form-date">
+      <button class="today-btn" onclick="setToday()">วันนี้</button>
+    </div>
+
+    <div class="form-section-title">ข้อมูลลูกค้า</div>
+
+    <div class="form-group">
+      <label>ชื่อลูกค้า <span class="req">*</span></label>
+      <input type="text" id="f-name" placeholder="เช่น บริษัท ABC">
+    </div>
+
+    <div class="form-group">
+      <label>สถานที่ส่งของ <span class="req">*</span></label>
+      <input type="text" id="f-location" placeholder="ชื่อโครงการ / ที่อยู่">
+    </div>
+
+    <div class="form-group">
+      <label>เบอร์โทรลูกค้า</label>
+      <input type="tel" id="f-phone" placeholder="0XX-XXX-XXXX">
+    </div>
+
+    <div class="form-section-title" style="margin-top:1rem">ข้อมูลสินค้า</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>โครงสร้างที่เท <span class="req">*</span></label>
+        <input type="text" id="f-struct" list="struct-list" placeholder="เลือกหรือพิมพ์เอง" autocomplete="off">
+        <datalist id="struct-list">
+          <option>เสา</option><option>คาน</option><option>พื้น</option>
+          <option>เสาเข็ม</option><option>เข็มเจาะ</option>
+          <option>สระว่ายน้ำ</option><option>ห้องเย็น</option><option>ผนัง</option>
+        </datalist>
+      </div>
+      <div class="form-group">
+        <label>กำลังอัด (KSC) <span class="req">*</span></label>
+        <input type="text" id="f-ksc" list="ksc-list" placeholder="เลือกหรือพิมพ์เอง" autocomplete="off">
+        <datalist id="ksc-list">
+          <option>180</option><option>210</option><option>240</option>
+          <option>280</option><option>320</option><option>350</option><option>400</option>
+        </datalist>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>รหัสสินค้า</label>
+        <input type="text" id="f-code" placeholder="เช่น 84281002">
+      </div>
+      <div class="form-group">
+        <label>จำนวน (คิว) <span class="req">*</span></label>
+        <input type="number" id="f-qty" placeholder="0" min="1">
+      </div>
+    </div>
+
+    <div class="form-section-title" style="margin-top:1rem">กำหนดการ</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>เวลาถึงหน้างาน <span class="req">*</span></label>
+        <input type="time" id="f-time">
+      </div>
+      <div class="form-group">
+        <label>ระยะห่างการเท (นาที)</label>
+        <input type="number" id="f-interval" placeholder="30" min="0">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>หมายเหตุ</label>
+      <textarea id="f-note" placeholder="เช่น เก็บลูกปูนหน้างาน, ขอ QC หน้างาน"></textarea>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="addBooking()">+ บันทึกการจอง</button>
+  </aside>
+
+  <main class="main">
+    <div class="stats-bar">
+      <div class="stat-card accent">
+        <div class="s-label">รายการจองวันนี้</div>
+        <div class="s-val" id="stat-count">0</div>
+        <div class="s-unit">รายการ</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">ปริมาณรวม</div>
+        <div class="s-val" id="stat-vol">0</div>
+        <div class="s-unit">คิว</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">เวลาแรกสุด</div>
+        <div class="s-val" id="stat-first" style="font-size:16px;padding-top:4px">—</div>
+        <div class="s-unit">น.</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">เวลาล่าสุด</div>
+        <div class="s-val" id="stat-last" style="font-size:16px;padding-top:4px">—</div>
+        <div class="s-unit">น.</div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" id="search-input" placeholder="ค้นหาชื่อ / สถานที่..." oninput="renderTable()">
+      <select id="filter-struct" onchange="renderTable()">
+        <option value="">โครงสร้างทั้งหมด</option>
+      </select>
+      <select id="filter-date" onchange="renderTable()">
+        <option value="">ทุกวัน</option>
+      </select>
+      <span class="rec-count" id="rec-count">0 รายการ</span>
+    </div>
+
+    <div class="view-tabs">
+      <button class="view-tab active" onclick="switchView('table', this)">ตารางรายการ</button>
+      <button class="view-tab" onclick="switchView('timeline', this)">ไทม์ไลน์รายวัน</button>
+      <button class="view-tab" id="cancel-tab" onclick="switchView('cancel', this)">ประวัติการยกเลิก</button>
+    </div>
+
+    <!-- TABLE VIEW -->
+    <div id="table-view" class="active-view">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="sortBy('time')">เวลา ↕</th>
+              <th onclick="sortBy('date')">วันที่ ↕</th>
+              <th class="no-sort">ลูกค้า / สถานที่</th>
+              <th onclick="sortBy('struct')">โครงสร้าง ↕</th>
+              <th onclick="sortBy('ksc')">KSC ↕</th>
+              <th class="no-sort">รหัสสินค้า</th>
+              <th onclick="sortBy('qty')">คิว ↕</th>
+              <th class="no-sort">ระยะห่างการเท (นาที)</th>
+              <th class="no-sort">หมายเหตุ</th>
+              <th class="no-sort"></th>
+            </tr>
+          </thead>
+          <tbody id="booking-tbody"></tbody>
+        </table>
+        <div id="empty-table" class="empty-state" style="display:none">
+          <div class="empty-icon">📋</div>
+          <p>ยังไม่มีรายการจอง</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIMELINE VIEW -->
+    <div id="timeline-view">
+      <div class="timeline-wrap">
+        <div class="timeline-title">ไทม์ไลน์การจอง</div>
+        <div id="timeline-body"></div>
+        <div id="empty-timeline" class="empty-state" style="display:none">
+          <div class="empty-icon">🕐</div>
+          <p>ยังไม่มีรายการจอง</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CANCEL LOG VIEW -->
+    <div id="cancel-view">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="no-sort">วันที่/เวลายกเลิก</th>
+              <th class="no-sort">ผู้ยกเลิก</th>
+              <th class="no-sort">ลูกค้า / สถานที่</th>
+              <th class="no-sort">วันที่จองเดิม</th>
+              <th class="no-sort">เวลาเดิม</th>
+              <th class="no-sort">โครงสร้าง</th>
+              <th class="no-sort">KSC</th>
+              <th class="no-sort">คิว</th>
+              <th class="no-sort">หมายเหตุการจอง</th>
+            </tr>
+          </thead>
+          <tbody id="cancel-tbody"></tbody>
+        </table>
+        <div id="empty-cancel" class="empty-state" style="display:none">
+          <div class="empty-icon">🗒️</div>
+          <p>ยังไม่มีประวัติการยกเลิก</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="del-modal" style="display:none" onclick="closeModalOutside(event)">
+  <div class="modal-box">
+    <div class="modal-title">ยืนยันการยกเลิกการจอง</div>
+    <div class="modal-sub">กรุณาระบุชื่อผู้ดำเนินการเพื่อบันทึกในประวัติ</div>
+    <div class="modal-booking-info">
+      <div class="mbi-name" id="modal-customer-name"></div>
+      <div class="mbi-detail" id="modal-booking-detail"></div>
+    </div>
+    <label class="modal-input-label">ชื่อผู้ยกเลิก / ผู้ดำเนินการ <span class="req">*</span></label>
+    <input type="text" class="modal-input" id="modal-canceller" placeholder="กรอกชื่อของคุณ">
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" onclick="closeModal()">ยกเลิก</button>
+      <button class="modal-confirm-btn" id="modal-confirm-btn" onclick="confirmDelete()">ยืนยันยกเลิกการจอง</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════
+   Google Sheets Web App URL
+   ════════════════════════════════════════════ */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwfaBOPxk_EyjaUv2jPcVKCXB3heNoVBUYgGQ1U5IavK3PuB5EF5wLr-3bZ9U3lkclU/exec';
+
+let bookings  = [];
+let cancelLog = [];
+let sortKey   = 'time';
+let sortAsc   = true;
+let pendingDeleteId = null;
+let isLoading = false;
+
+const structColors = {
+  'เสา':'#1A5A8C','คาน':'#854F0B','พื้น':'#1A6B3A',
+  'เสาเข็ม':'#533AB7','เข็มเจาะ':'#7B3A7B',
+  'สระว่ายน้ำ':'#0F6E56','ห้องเย็น':'#185FA5',
+  'ผนัง':'#5C5749','อื่นๆ':'#9A9287',
+};
+
+function getStructColor(s) { return structColors[s] || '#5C5749'; }
+
+/* ── Helpers ── */
+function initDate() {
+  const today = new Date();
+  document.getElementById('form-date').value = today.toISOString().split('T')[0];
+  const days = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+  document.getElementById('header-date').textContent =
+    `วัน${days[today.getDay()]}ที่ ${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()+543}`;
+}
+
+function setToday() {
+  document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show ${type}`;
+  setTimeout(() => { t.className = ''; }, 2800);
+}
+
+function setLoading(on) {
+  isLoading = on;
+  document.getElementById('submit-btn').disabled = on;
+  document.getElementById('submit-btn').textContent = on ? 'กำลังบันทึก...' : '+ บันทึกการจอง';
+}
+
+function formatDateShort(iso) {
+  if (!iso) return '—';
+  const [y, m, d] = iso.split('-');
+  return `${parseInt(d)}/${parseInt(m)}/${parseInt(y)+543}`;
+}
+
+function formatDateTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(parseInt(ts));
+  const pad = n => String(n).padStart(2,'0');
+  return `${formatDateShort(d.toISOString().split('T')[0])} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ════════════════════════════════════════════
+   Google Sheets API calls
+   ════════════════════════════════════════════ */
+async function gasGet() {
+  const res = await fetch(GAS_URL);
+  return res.json();
+}
+
+async function gasPost(body) {
+  const res = await fetch(GAS_URL, {
+    method: 'POST',
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+/* โหลดข้อมูลทั้งหมดจาก Sheets */
+async function loadFromSheets() {
+  try {
+    showLoadingState(true);
+    const data = await gasGet();
+
+    /* bookings: แต่ละแถว = [id,date,name,location,phone,struct,ksc,code,qty,time,interval,note] */
+    bookings = (data.bookings || []).map(r => ({
+      id: r[0], date: r[1], name: r[2], location: r[3], phone: r[4],
+      struct: r[5], ksc: r[6], code: r[7], qty: r[8], time: r[9],
+      interval: r[10], note: r[11]
+    }));
+
+    /* cancel_log: [cancelledAt,cancelledBy, bk.id,bk.date,bk.name,bk.location,bk.phone,bk.struct,bk.ksc,bk.code,bk.qty,bk.time,bk.interval,bk.note] */
+    cancelLog = (data.cancelLog || []).map(r => ({
+      cancelledAt: r[0], cancelledBy: r[1],
+      booking: {
+        id: r[2], date: r[3], name: r[4], location: r[5], phone: r[6],
+        struct: r[7], ksc: r[8], code: r[9], qty: r[10], time: r[11],
+        interval: r[12], note: r[13]
+      }
+    }));
+
+    renderTable();
+    renderCancelLog();
+    updateStats();
+    updateFilters();
+    updateCancelBadge();
+  } catch(err) {
+    showToast('โหลดข้อมูลไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ', 'error');
+    console.error(err);
+  } finally {
+    showLoadingState(false);
+  }
+}
+
+function showLoadingState(on) {
+  document.getElementById('booking-tbody').innerHTML = on
+    ? `<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--text3)">กำลังโหลดข้อมูล...</td></tr>`
+    : '';
+}
+
+/* ════════════════════════════════════════════
+   Add booking
+   ════════════════════════════════════════════ */
+async function addBooking() {
+  if (isLoading) return;
+  const name     = document.getElementById('f-name').value.trim();
+  const location = document.getElementById('f-location').value.trim();
+  const phone    = document.getElementById('f-phone').value.trim();
+  const struct   = document.getElementById('f-struct').value.trim();
+  const ksc      = document.getElementById('f-ksc').value.trim();
+  const code     = document.getElementById('f-code').value.trim();
+  const qty      = parseFloat(document.getElementById('f-qty').value);
+  const time     = document.getElementById('f-time').value;
+  const interval = document.getElementById('f-interval').value.trim();
+  const note     = document.getElementById('f-note').value.trim();
+  const date     = document.getElementById('form-date').value;
+
+  if (!name)           { showToast('กรุณาระบุชื่อลูกค้า', 'error'); return; }
+  if (!location)       { showToast('กรุณาระบุสถานที่ส่งของ', 'error'); return; }
+  if (!struct)         { showToast('กรุณาเลือกโครงสร้าง', 'error'); return; }
+  if (!ksc)            { showToast('กรุณาเลือกกำลังอัด', 'error'); return; }
+  if (!qty || qty <= 0){ showToast('กรุณาระบุจำนวนคิว', 'error'); return; }
+  if (!time)           { showToast('กรุณาระบุเวลาถึงหน้างาน', 'error'); return; }
+  if (!date)           { showToast('กรุณาเลือกวันที่', 'error'); return; }
+
+  const booking = { id: Date.now(), date, name, location, phone, struct, ksc, code, qty, time, interval, note };
+
+  setLoading(true);
+  try {
+    await gasPost({ action: 'addBooking', booking });
+    bookings.push(booking);
+    resetForm();
+    renderTable();
+    updateStats();
+    updateFilters();
+    showToast(`บันทึกการจองของ ${name} แล้ว ✓`);
+  } catch(err) {
+    showToast('บันทึกไม่สำเร็จ กรุณาลองใหม่', 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+function resetForm() {
+  ['f-name','f-location','f-phone','f-code','f-qty','f-interval','f-note','f-struct','f-ksc'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-time').value = '';
+}
+
+/* ════════════════════════════════════════════
+   Delete flow
+   ════════════════════════════════════════════ */
+function deleteBooking(id) {
+  const b = bookings.find(x => String(x.id) === String(id));
+  if (!b) return;
+  pendingDeleteId = id;
+  document.getElementById('modal-customer-name').textContent = `${b.name}  —  ${b.location}`;
+  document.getElementById('modal-booking-detail').textContent =
+    `${formatDateShort(b.date)}  เวลา ${b.time}  |  ${b.struct}  ${b.ksc} KSC  ${b.qty} คิว`;
+  document.getElementById('modal-canceller').value = '';
+  document.getElementById('del-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('modal-canceller').focus(), 80);
+}
+
+function closeModal() {
+  document.getElementById('del-modal').style.display = 'none';
+  pendingDeleteId = null;
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('del-modal')) closeModal();
+}
+
+async function confirmDelete() {
+  const canceller = document.getElementById('modal-canceller').value.trim();
+  if (!canceller) {
+    document.getElementById('modal-canceller').focus();
+    document.getElementById('modal-canceller').style.borderColor = 'var(--red)';
+    showToast('กรุณาระบุชื่อผู้ยกเลิก', 'error');
+    return;
+  }
+  document.getElementById('modal-canceller').style.borderColor = '';
+
+  const b = bookings.find(x => String(x.id) === String(pendingDeleteId));
+  if (!b) { closeModal(); return; }
+
+  const entry = { cancelledAt: Date.now(), cancelledBy: canceller, booking: { ...b } };
+
+  const btn = document.getElementById('modal-confirm-btn');
+  btn.disabled = true;
+  btn.textContent = 'กำลังบันทึก...';
+
+  try {
+    await gasPost({ action: 'deleteBooking', id: b.id });
+    await gasPost({ action: 'addCancelLog', entry });
+
+    bookings  = bookings.filter(x => String(x.id) !== String(pendingDeleteId));
+    cancelLog.unshift(entry);
+
+    closeModal();
+    renderTable();
+    renderCancelLog();
+    updateStats();
+    updateFilters();
+    updateCancelBadge();
+    showToast(`ยกเลิกการจองของ ${b.name} แล้ว (โดย ${canceller})`);
+  } catch(err) {
+    showToast('เกิดข้อผิดพลาด กรุณาลองใหม่', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'ยืนยันยกเลิกการจอง';
+  }
+}
+
+/* ════════════════════════════════════════════
+   Filters & Sort
+   ════════════════════════════════════════════ */
+function getFiltered() {
+  const search     = document.getElementById('search-input').value.toLowerCase();
+  const struct     = document.getElementById('filter-struct').value;
+  const dateFilter = document.getElementById('filter-date').value;
+  return bookings.filter(b => {
+    const matchSearch = !search ||
+      b.name.toLowerCase().includes(search) ||
+      b.location.toLowerCase().includes(search) ||
+      (b.phone && String(b.phone).includes(search));
+    const matchStruct = !struct || b.struct === struct;
+    const matchDate   = !dateFilter || b.date === dateFilter;
+    return matchSearch && matchStruct && matchDate;
+  });
+}
+
+function getSorted(arr) {
+  return [...arr].sort((a, b) => {
+    let va = a[sortKey] || '', vb = b[sortKey] || '';
+    if (sortKey === 'qty' || sortKey === 'ksc') { va = parseFloat(va)||0; vb = parseFloat(vb)||0; }
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ? 1 : -1;
+    return a.time < b.time ? -1 : 1;
+  });
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortAsc = !sortAsc;
+  else { sortKey = key; sortAsc = true; }
+  renderTable();
+}
+
+/* ════════════════════════════════════════════
+   Render
+   ════════════════════════════════════════════ */
+function renderTable() {
+  const filtered = getSorted(getFiltered());
+  document.getElementById('rec-count').textContent = `${filtered.length} รายการ`;
+  const tbody = document.getElementById('booking-tbody');
+  const empty = document.getElementById('empty-table');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = filtered.map(b => {
+      const color = getStructColor(b.struct);
+      return `<tr>
+        <td class="time-cell">${b.time || '—'}</td>
+        <td style="font-size:12px;color:var(--text2)">${formatDateShort(b.date)}</td>
+        <td>
+          <div class="customer-name">${esc(b.name)}</div>
+          <div class="location-text">${esc(b.location)}</div>
+          ${b.phone ? `<div class="phone-text">${esc(b.phone)}</div>` : ''}
+        </td>
+        <td><span class="struct-badge" style="background:${color}18;color:${color}">${esc(b.struct)}</span></td>
+        <td><span class="ksc-badge">${esc(b.ksc)}</span></td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text3)">${esc(b.code)||'—'}</td>
+        <td class="vol-cell">${b.qty}</td>
+        <td class="interval-text">${b.interval ? b.interval+' นาที' : '—'}</td>
+        <td><div class="note-text" title="${esc(b.note)}">${esc(b.note)||'—'}</div></td>
+        <td><button class="del-btn" onclick="deleteBooking('${b.id}')">ยกเลิก</button></td>
+      </tr>`;
+    }).join('');
+  }
+  renderTimeline(filtered);
+  updateStats();
+}
+
+function renderCancelLog() {
+  const tbody = document.getElementById('cancel-tbody');
+  const empty = document.getElementById('empty-cancel');
+  if (cancelLog.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = cancelLog.map(entry => {
+    const b = entry.booking;
+    const color = getStructColor(b.struct);
+    return `<tr class="cancelled-row">
+      <td><div style="font-size:12px;font-weight:600;color:var(--text2)">${formatDateTime(entry.cancelledAt)}</div></td>
+      <td>
+        <div class="canceller-text">${esc(entry.cancelledBy)}</div>
+        <span class="cancelled-badge">ยกเลิกแล้ว</span>
+      </td>
+      <td>
+        <div class="customer-name">${esc(b.name)}</div>
+        <div class="location-text">${esc(b.location)}</div>
+        ${b.phone ? `<div class="phone-text">${esc(b.phone)}</div>` : ''}
+      </td>
+      <td style="font-size:12px;color:var(--text2)">${formatDateShort(b.date)}</td>
+      <td class="time-cell">${b.time||'—'}</td>
+      <td><span class="struct-badge" style="background:${color}18;color:${color}">${esc(b.struct)}</span></td>
+      <td><span class="ksc-badge">${esc(b.ksc)}</span></td>
+      <td class="vol-cell">${b.qty}</td>
+      <td><div class="note-text" title="${esc(b.note)}">${esc(b.note)||'—'}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderTimeline(filtered) {
+  const body  = document.getElementById('timeline-body');
+  const empty = document.getElementById('empty-timeline');
+  if (filtered.length === 0) { body.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  const byDate = {};
+  filtered.forEach(b => { if (!byDate[b.date]) byDate[b.date] = []; byDate[b.date].push(b); });
+  body.innerHTML = Object.keys(byDate).sort().map(date => {
+    const items    = [...byDate[date]].sort((a,b) => a.time < b.time ? -1 : 1);
+    const totalQty = items.reduce((s,b) => s + (parseFloat(b.qty)||0), 0);
+    return `<div style="margin-bottom:1.5rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:600;color:var(--text2)">${formatDateShort(date)}</div>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <div style="font-size:12px;color:var(--text3)">รวม ${totalQty} คิว / ${items.length} รายการ</div>
+      </div>
+      ${items.map((b,i) => {
+        const color = getStructColor(b.struct);
+        return `<div class="tl-item">
+          <div class="tl-time">${b.time}</div>
+          <div class="tl-line">
+            <div class="tl-dot" style="background:${color}"></div>
+            ${i < items.length-1 ? '<div class="tl-connector"></div>' : ''}
+          </div>
+          <div class="tl-content">
+            <div class="tl-customer">${esc(b.name)} — ${esc(b.location)}</div>
+            <div class="tl-meta">
+              <span class="struct-badge" style="background:${color}18;color:${color}">${esc(b.struct)}</span>
+              &nbsp;${b.ksc} KSC &nbsp;·&nbsp; ${b.qty} คิว
+              ${b.interval ? ` &nbsp;·&nbsp; ระยะ ${b.interval} นาที` : ''}
+              ${b.note ? ` &nbsp;·&nbsp; <span style="color:var(--amber)">${esc(b.note)}</span>` : ''}
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function updateStats() {
+  const todayISO   = new Date().toISOString().split('T')[0];
+  const todayItems = bookings.filter(b => b.date === todayISO);
+  document.getElementById('stat-count').textContent = todayItems.length;
+  document.getElementById('stat-vol').textContent   = todayItems.reduce((s,b) => s + (parseFloat(b.qty)||0), 0);
+  const times = todayItems.map(b => b.time).filter(Boolean).sort();
+  document.getElementById('stat-first').textContent = times.length ? times[0] : '—';
+  document.getElementById('stat-last').textContent  = times.length ? times[times.length-1] : '—';
+}
+
+function updateFilters() {
+  const dsel  = document.getElementById('filter-date');
+  const dcur  = dsel.value;
+  const dates = [...new Set(bookings.map(b => b.date))].sort();
+  dsel.innerHTML = '<option value="">ทุกวัน</option>' +
+    dates.map(d => `<option value="${d}" ${d===dcur?'selected':''}>${formatDateShort(d)}</option>`).join('');
+
+  const ssel    = document.getElementById('filter-struct');
+  const scur    = ssel.value;
+  const structs = [...new Set(bookings.map(b => b.struct).filter(Boolean))].sort();
+  ssel.innerHTML = '<option value="">โครงสร้างทั้งหมด</option>' +
+    structs.map(s => `<option value="${esc(s)}" ${s===scur?'selected':''}>${esc(s)}</option>`).join('');
+}
+
+function updateCancelBadge() {
+  const tab      = document.getElementById('cancel-tab');
+  const existing = tab.querySelector('.badge-dot');
+  if (cancelLog.length > 0 && !existing) {
+    const dot = document.createElement('span');
+    dot.className = 'badge-dot';
+    tab.appendChild(dot);
+  } else if (cancelLog.length === 0 && existing) {
+    existing.remove();
+  }
+}
+
+function switchView(view, btn) {
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('table-view').classList.toggle('active-view', view === 'table');
+  document.getElementById('timeline-view').classList.toggle('active-view', view === 'timeline');
+  document.getElementById('cancel-view').classList.toggle('active-view', view === 'cancel');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && document.getElementById('del-modal').style.display !== 'none') confirmDelete();
+});
+
+/* ── Start ── */
+initDate();
+loadFromSheets();
+</script>
+</body>
+</html>
